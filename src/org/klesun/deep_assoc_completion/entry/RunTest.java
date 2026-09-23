@@ -1,8 +1,10 @@
 package org.klesun.deep_assoc_completion.entry;
 
+import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.LangDataKeys;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.PhpIndex;
@@ -30,6 +32,12 @@ import static org.klesun.lang.Lang.*;
 
 public class RunTest extends AnAction
 {
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread()
+    {
+        return ActionUpdateThread.EDT;
+    }
+
     private static Opt<It<Method>> findTestDataPvdrFuncs(PsiFile psiFile)
     {
         It<Method> meths = It(PhpIndex.getInstance(psiFile.getProject()).getClassesByName("UnitTest"))
@@ -115,7 +123,7 @@ public class RunTest extends AnAction
     {
         Logger logger = new Logger();
         logger.scheduleBg(() -> {
-            It<Error> exactKeyErrors = opt(e.getData(LangDataKeys.PSI_FILE))
+            It<Error> exactKeyErrors = opt(e.getData(CommonDataKeys.PSI_FILE))
                 .fop(RunTest::findExactKeysTestDataPvdrFuncs)
                 .els(() -> System.out.println("Failed to find data-providing functions"))
                 .fap(funcs -> funcs.fap(f -> parseReturnedTestCase(f, logger)))
@@ -138,7 +146,7 @@ public class RunTest extends AnAction
                         return list(new Error(ctx, msg));
                     }
                 }));
-            It<Error> errors = opt(e.getData(LangDataKeys.PSI_FILE))
+            It<Error> errors = opt(e.getData(CommonDataKeys.PSI_FILE))
                 .fop(RunTest::findTestDataPvdrFuncs)
                 .els(() -> System.out.println("Failed to find data-providing functions"))
                 .fap(funcs -> funcs.fap(f -> parseReturnedTestCase(f, logger)))
@@ -153,7 +161,7 @@ public class RunTest extends AnAction
                         return list(new Error(tuple.a, msg));
                     }
                 });
-            It<Error> usageErrors = opt(e.getData(LangDataKeys.PSI_FILE))
+            It<Error> usageErrors = opt(e.getData(CommonDataKeys.PSI_FILE))
                 .fop(RunTest::findUsageTestDataPvdrFuncs)
                 .els(() -> System.out.println("Failed to find usage data-providing functions"))
                 .fap(funcs -> funcs.fap(f -> {

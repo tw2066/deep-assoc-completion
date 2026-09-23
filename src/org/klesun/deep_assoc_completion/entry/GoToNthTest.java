@@ -1,8 +1,10 @@
 package org.klesun.deep_assoc_completion.entry;
 
+import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.LangDataKeys;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.ui.DialogBuilder;
@@ -31,6 +33,12 @@ import static org.klesun.lang.Lang.*;
 
 public class GoToNthTest extends AnAction
 {
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread()
+    {
+        return ActionUpdateThread.EDT;
+    }
+
     private static void askForText(String msg, C<String> then)
     {
         JFormattedTextField input = new JFormattedTextField();
@@ -55,11 +63,11 @@ public class GoToNthTest extends AnAction
 
     public void actionPerformed(AnActionEvent e)
     {
-        SearchCtx search = new SearchCtx(opt(e.getData(LangDataKeys.EDITOR)).map(ed -> ed.getProject()).def(null))
+        SearchCtx search = new SearchCtx(opt(e.getData(CommonDataKeys.EDITOR)).map(ed -> ed.getProject()).def(null))
             .setDepth(20);
         FuncCtx funcCtx = new FuncCtx(search);
-        Opt<PsiFile> psiFileOpt = opt(e.getData(LangDataKeys.PSI_FILE));
-        Opt<Caret> caretOpt = opt(e.getData(LangDataKeys.CARET));
+        Opt<PsiFile> psiFileOpt = opt(e.getData(CommonDataKeys.PSI_FILE));
+        Opt<Caret> caretOpt = opt(e.getData(CommonDataKeys.CARET));
 
         String msg = "Enter the index of PHPUnit test in the current function";
         askForText(msg, (testNumStr) -> opt(toInt(testNumStr).def(0))

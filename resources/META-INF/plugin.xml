@@ -1,10 +1,11 @@
 <idea-plugin>
-    <id>lv.midiana.misc.phpstorm-plugins.deep-keys</id>
-    <name>deep-assoc-completion</name>
-    <version>2022.08.03.001</version>
-    <vendor email="arturklesun@gmail.com" url="https://klesun-productions.com/entry/deep-assoc-completion">klesun</vendor>
+    <id>com.tang.deep-assoc-completion</id>
+    <name>Deep Assoc Completion (Community)</name>
+    <vendor>Mr.tang</vendor>
 
     <description><![CDATA[
+<p><b>Community-maintained fork of <a href="https://plugins.jetbrains.com/plugin/9927-deep-assoc-completion">deep-assoc-completion</a>
+by Artur Klesun</b> (Beer-Ware license, original is unmaintained since 2022). Supports PhpStorm 2026.2+.</p>
 <ul>
   <li>PHP associative array auto-completion inferred from other functions.</li>
   <li>Go To key Definition.</li>
@@ -49,12 +50,11 @@
 
     <change-notes><![CDATA[
     <ul>
-        <li>Rebuild with UI Designer turned on, as last build had Setting page inaccessible</li>
+        <li>Ported to PhpStorm 2026.2 (build 262.*). This and future releases support 2026.2 only; keep using 2022.08.03.001 on older IDEs.</li>
+        <li>Removed the long-disabled "remove unused uses on save" feature.</li>
     </ul>
     ]]>
     </change-notes>
-
-    <idea-version since-build="221.1.1"/> <!-- breaking changes in the IDE API related to progress indicator -->
 
     <extensions defaultExtensionNs="com.intellij">
         <completion.contributor order="first" language="PHP" implementationClass="org.klesun.deep_assoc_completion.entry.DirectTypeCompletionContributor"/>
@@ -71,13 +71,11 @@
             nonDefaultProject="true"
         />
         <projectService serviceImplementation="org.klesun.deep_assoc_completion.entry.DeepSettings"/>
-        <!-- disabled, as since 2022.1 it causes errors about progress indicator -->
-<!--        <fileDocumentManagerListener implementation="org.klesun.deep_assoc_completion.entry.RemoveUnusedUsesSaveHandler"/>-->
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
         <typeProvider4 order="first" implementation="org.klesun.deep_assoc_completion.entry.MixedTypePvdr"/>
-        <typeProvider3 order="last" implementation="org.klesun.deep_assoc_completion.entry.AssocTypePvdr"/>
+        <typeProvider4 order="last" implementation="org.klesun.deep_assoc_completion.entry.AssocTypePvdr"/>
     </extensions>
 
 
@@ -86,6 +84,7 @@
     <depends>com.intellij.modules.lang</depends>
     <depends>com.jetbrains.php</depends>
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.json</depends>
 
     <!-- gonna implement array keys inference from SELECT * -->
     <depends>com.intellij.database</depends>

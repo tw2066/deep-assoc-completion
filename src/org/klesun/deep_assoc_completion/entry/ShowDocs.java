@@ -1,9 +1,11 @@
 package org.klesun.deep_assoc_completion.entry;
 
+import org.jetbrains.annotations.NotNull;
 import com.intellij.json.JsonFileType;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.LangDataKeys;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
@@ -34,6 +36,12 @@ import static org.klesun.lang.Lang.*;
 
 public class ShowDocs extends AnAction
 {
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread()
+    {
+        return ActionUpdateThread.EDT;
+    }
+
     public static It<DeepType> findPsiType(PsiElement psi)
     {
         SearchCtx search = new SearchCtx(psi.getProject())
@@ -65,8 +73,8 @@ public class ShowDocs extends AnAction
 
     public void actionPerformed(AnActionEvent e)
     {
-        String doc = opt(e.getData(LangDataKeys.PSI_FILE))
-            .fop(psiFile -> opt(e.getData(LangDataKeys.CARET))
+        String doc = opt(e.getData(CommonDataKeys.PSI_FILE))
+            .fop(psiFile -> opt(e.getData(CommonDataKeys.CARET))
                 .map(caret -> psiFile.findElementAt(caret.getOffset())))
             .map(psi -> psi instanceof LeafPsiElement ? psi.getParent() : psi)
             .map(psi -> DeepType.varExport(findPsiType(psi).arr()))

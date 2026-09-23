@@ -5,7 +5,6 @@ import com.intellij.patterns.PsiElementPattern;
 import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.lang.PhpCallbackFunctionUtil;
 import static com.jetbrains.php.lang.PhpCallbackReferenceBase.PhpClassMemberCallbackReference;
 import com.jetbrains.php.lang.PhpLanguage;
 import com.jetbrains.php.lang.parser.PhpElementTypes;

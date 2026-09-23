@@ -88,18 +88,17 @@ Jetbrains Repository: [9927-deep-assoc-completion](https://plugins.jetbrains.com
 <hr/>
 <hr/>
 
-## Steps to compile plugin into a `.jar` follow:
+## Building
 
-- Start creating a new project in _[Intelliji Idea](https://www.jetbrains.com/idea/)_.
-- Select `Intelliji Platform Plugin`.
-- Select a _phpstorm_ or _IDEA Ultimate_ installation directory as `Project SDK` (java version is 8).
-- Select `deep-assoc-completion` project folder as `Project location`.
-- In `Project Structure -> Libraries` add `php/lib/php.jar`, `php/lib/php-openapi.jar` and `twig/lib/twig.jar` from `YourPhpStormDirectory/plugins/[php|twig]` (in case of _IDEA Ultimate_, the `php` and `twig` plugins should be installed, and the location is `HomeOrMyDocumentsDir/.IntellijIdea20XX.X/config/plugins/[php|twig]/lib`).
-- In `Project Structure -> Modules -> Dependencies` set `Scope` of `php`, `php-openapi` and `twig` to `Provided`.
+The plugin is built with Gradle (IntelliJ Platform Gradle Plugin 2.x) targeting PhpStorm 2026.2.
 
-To build a jar use `Build -> Prepare Plugin ... For Deployment`. To debug use `Run -> Debug`. Since phpstorm project takes about a minute to start, you must find `Run -> Reload Changed Classes` very useful for micro changes.
+Requirements: JDK 17+ to run Gradle. A JDK 21 toolchain is needed for compilation — it is downloaded automatically via the foojay toolchain resolver, or install Temurin/JBR 21 yourself.
 
-To use compiled `.jar` in your phpstorm go to `Settings -> Plugins -> Install plugin from disk` and select the `.jar` we compiled earlier.
+- Build the plugin zip: `./gradlew buildPlugin` → `build/distributions/deep-assoc-completion-<version>.zip`
+- Run a sandboxed PhpStorm 2026.2 with the plugin loaded: `./gradlew runIde`
+- Verify the plugin against the target IDE: `./gradlew verifyPlugin`
+
+To use the compiled `.zip` in your PhpStorm go to `Settings -> Plugins -> ⚙ -> Install Plugin from Disk` and select the zip built earlier.
 
 _________________________________________________________
 

@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
-import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
+import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider4;
 import org.jetbrains.annotations.Nullable;
 import org.klesun.deep_assoc_completion.contexts.ExprCtx;
 import org.klesun.deep_assoc_completion.contexts.FuncCtx;
@@ -21,7 +21,7 @@ import org.klesun.lang.Tls;
 import java.util.Collection;
 import java.util.Set;
 
-public class AssocTypePvdr extends Lang implements PhpTypeProvider3
+public class AssocTypePvdr extends Lang implements PhpTypeProvider4
 {
     public char getKey()
     {
@@ -39,7 +39,7 @@ public class AssocTypePvdr extends Lang implements PhpTypeProvider3
             return null;
         }
 
-        if (DumbService.isDumb(psi.getProject())) {
+        if (DumbService.getInstance(psi.getProject()).isDumb()) {
             // following code relies on complex reference resolutions
             // very much, so trying to resolve type during indexing
             // is pointless and causes Contract Violation exceptions
@@ -98,9 +98,10 @@ public class AssocTypePvdr extends Lang implements PhpTypeProvider3
         return result;
     }
 
-    // 2016.2.2
-    public Collection<? extends PhpNamedElement> getBySignature(String s, Project project) {
-        return list();
+    @Nullable
+    @Override
+    public PhpType complete(String expression, Project project) {
+        return null;
     }
 
     public Collection<? extends PhpNamedElement> getBySignature(String s, Set<String> set, int i, Project project)

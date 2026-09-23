@@ -9,12 +9,7 @@ import org.klesun.lang.Opt;
 import static org.klesun.lang.Lang.opt;
 import static org.klesun.lang.Lang.som;
 
-@State(
-    name = "DeepAssocCompletionPluginSettings",
-    storages = {
-        @Storage(StoragePathMacros.WORKSPACE_FILE),
-    }
-)
+@State(name = "DeepAssocCompletionPluginSettings")
 public class DeepSettings implements PersistentStateComponent<DeepSettings> {
     public Boolean bgTypePvdrEnabled = false;
     public Integer bgTypePvdrDepthLimit = 5;
@@ -29,7 +24,7 @@ public class DeepSettings implements PersistentStateComponent<DeepSettings> {
 
     public static DeepSettings inst(Project project) {
         return Opt.fst(
-            () -> opt(ServiceManager.getService(project, DeepSettings.class)),
+            () -> opt(project.getService(DeepSettings.class)),
             () -> som(new DeepSettings())
         ).unw();
     }

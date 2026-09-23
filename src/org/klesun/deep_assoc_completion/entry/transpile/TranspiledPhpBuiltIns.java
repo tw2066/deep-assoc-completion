@@ -1,5 +1,7 @@
 package org.klesun.deep_assoc_completion.entry.transpile;
 
+import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.klesun.lang.L;
@@ -11,6 +13,12 @@ import java.util.stream.Collectors;
 
 public class TranspiledPhpBuiltIns extends AnAction
 {
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread()
+    {
+        return ActionUpdateThread.EDT;
+    }
+
     @Override
     public void actionPerformed(AnActionEvent e)
     {

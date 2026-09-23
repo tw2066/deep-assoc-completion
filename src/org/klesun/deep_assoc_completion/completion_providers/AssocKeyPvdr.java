@@ -323,7 +323,7 @@ public class AssocKeyPvdr extends CompletionProvider<CompletionParameters>
     @Override
     protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext processingContext, @NotNull CompletionResultSet result)
     {
-        if (DumbService.isDumb(parameters.getPosition().getProject())) {
+        if (DumbService.getInstance(parameters.getPosition().getProject()).isDumb()) {
             // following code relies on complex reference resolutions
             // very much, so trying to resolve type during indexing
             // is pointless and is likely to cause exceptions

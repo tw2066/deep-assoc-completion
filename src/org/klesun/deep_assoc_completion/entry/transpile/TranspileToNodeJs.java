@@ -1,12 +1,16 @@
 package org.klesun.deep_assoc_completion.entry.transpile;
 
+import org.jetbrains.annotations.NotNull;
 import com.intellij.ide.scratch.ScratchFileService;
 import com.intellij.ide.scratch.ScratchRootType;
-import com.intellij.ide.util.PsiNavigationSupport;
 import com.intellij.lang.Language;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.LangDataKeys;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.fileTypes.PlainTextLanguage;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -28,6 +32,12 @@ import static org.klesun.lang.Tls.getChildrenWithLeaf;
 
 public class TranspileToNodeJs extends AnAction
 {
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread()
+    {
+        return ActionUpdateThread.EDT;
+    }
+
     private It<PsiElement> removeClsMods(It<PsiElement> clsParts)
     {
         return clsParts
@@ -377,7 +387,7 @@ public class TranspileToNodeJs extends AnAction
 
     public static void openAsScratchFile(String text, AnActionEvent e, String name)
     {
-        opt(e.getData(LangDataKeys.PROJECT)).thn(project -> {
+        opt(e.getData(CommonDataKeys.PROJECT)).thn(project -> {
             Language lang = L(Language.findInstancesByMimeType("text/javascript")).fst()
                 .def(PlainTextLanguage.INSTANCE);
             VirtualFile file = ScratchRootType.getInstance().createScratchFile(
@@ -385,7 +395,7 @@ public class TranspileToNodeJs extends AnAction
                 text, ScratchFileService.Option.create_new_always
             );
             if (file != null) {
-                PsiNavigationSupport.getInstance().createNavigatable(project, file, 0).navigate(true);
+                new OpenFileDescriptor(project, file, 0).navigate(true);
                 PsiFile nullPsiFile = PsiManager.getInstance(project).findFile(file);
                 opt(e.getData(LangDataKeys.IDE_VIEW))
                     .thn(ideView -> opt(nullPsiFile)
@@ -397,7 +407,7 @@ public class TranspileToNodeJs extends AnAction
     @Override
     public void actionPerformed(AnActionEvent e)
     {
-        String output = opt(e.getData(LangDataKeys.PSI_FILE))
+        String output = opt(e.getData(CommonDataKeys.PSI_FILE))
             .map(psiFile -> It(psiFile.getChildren()).map(psi -> trans(psi)))
             .map(psiTexts -> Tls.implode("", psiTexts))
             .def("Error: could not retrieve current file");
