@@ -78,7 +78,7 @@ public class AssocTypePvdr extends Lang implements PhpTypeProvider4
         } catch (Throwable exc) {
             // throwing some exceptions further would cause class to become undefined
             L<Class> allowedExceptions = list(ControlFlowException.class);
-            if (allowedExceptions.any(excCls -> exc.getClass().isAssignableFrom(excCls))) {
+            if (allowedExceptions.any(excCls -> excCls.isInstance(exc))) {
                 throw exc;
             } else {
                 String msg = "Unexpected exception in deep-assoc-completion plugin - " + exc.getClass() + " while resolving " + psi.getText() + " " + psi.getClass() + " " + opt(psi.getContainingFile()).map(f -> f.getName()).def("(no file)") + " :" + psi.getTextOffset();

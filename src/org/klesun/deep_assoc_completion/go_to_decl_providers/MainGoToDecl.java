@@ -2,6 +2,7 @@ package org.klesun.deep_assoc_completion.go_to_decl_providers;
 
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.diagnostic.ControlFlowException;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -101,22 +102,34 @@ public class MainGoToDecl implements GotoDeclarationHandler {
     @Override
     public PsiElement[] getGotoDeclarationTargets(@Nullable PsiElement nullPsi, int mouseOffset, Editor editor)
     {
-        Boolean prevFinished = lastFinished;
-        lastFinished = false;
-        Boolean isSecondAttempt = lastCaretPsi.map(last -> last.equals(nullPsi)).def(false);
-        It<PsiElement> psiit = opt(nullPsi)
-            .fap(psiElement -> {
-                SearchCtx search = new SearchCtx(psiElement.getProject())
-                    .setDepth(AssocKeyPvdr.getMaxDepth(false, psiElement.getProject()));
-                FuncCtx funcCtx = new FuncCtx(search);
-                return resolveDeclPsis(psiElement, mouseOffset, funcCtx)
-                    .map(psi -> truncateOnLineBreak(psi));
-            });
-        psiit = psiit.end((itpsi) -> !isSecondAttempt || !prevFinished).unq();
-        L<PsiElement> arr = psiit.arr();
-        lastCaretPsi = opt(nullPsi);
-        lastFinished = true;
-        return arr.toArray(new PsiElement[arr.size()]);
+        try {
+            Boolean prevFinished = lastFinished;
+            lastFinished = false;
+            Boolean isSecondAttempt = lastCaretPsi.map(last -> last.equals(nullPsi)).def(false);
+            It<PsiElement> psiit = opt(nullPsi)
+                .fap(psiElement -> {
+                    SearchCtx search = new SearchCtx(psiElement.getProject())
+                        .setDepth(AssocKeyPvdr.getMaxDepth(false, psiElement.getProject()));
+                    FuncCtx funcCtx = new FuncCtx(search);
+                    return resolveDeclPsis(psiElement, mouseOffset, funcCtx)
+                        .map(psi -> truncateOnLineBreak(psi));
+                });
+            psiit = psiit.end((itpsi) -> !isSecondAttempt || !prevFinished).unq();
+            L<PsiElement> arr = psiit.arr();
+            lastCaretPsi = opt(nullPsi);
+            return arr.toArray(new PsiElement[arr.size()]);
+        } catch (Throwable exc) {
+            // stub index may be outdated (e.g. vendor files changed on a \\wsl$ mount without
+            // the IDE noticing) - platform reindexes such files, so just skip this resolution
+            if (exc instanceof ControlFlowException) {
+                throw exc;
+            }
+            com.intellij.openapi.diagnostic.Logger.getInstance(getClass())
+                .warn("deep-assoc-completion: failed to resolve go-to-declaration targets", exc);
+            return null;
+        } finally {
+            lastFinished = true;
+        }
     }
 
     // need for pre-183.5153.4
